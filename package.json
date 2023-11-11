@@ -1,5 +1,5 @@
 {
-  "name": "nodejs-sandbox",
+  "name": "project6-server",
   "version": "1.0.0",
   "description": "",
   "main": "index.html",
@@ -11,7 +11,7 @@
     "url": "git+https://github.com/codesandbox-app/static-template.git"
   },
   "keywords": [],
-  "author": "Ives van Hoorne",
+  "author": "Samuel Muhigirwa",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/codesandbox-app/static-template/issues"
