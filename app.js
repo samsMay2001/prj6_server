@@ -46,7 +46,15 @@ const limiter = rateLimit({
 
 const connectMongo = async () => {
   try {
-    await mongoose.connect("mongodb+srv://samsMay:samever7@cluster0.zyihuu3.mongodb.net/?retryWrites=true&w=majority");
+    await mongoose.connect(
+      "mongodb+srv://samsMay:samever7@cluster0.zyihuu3.mongodb.net/?retryWrites=true&w=majority",
+      {
+        useNewUrlParser: true, // this is not needed in this version of nodejs
+        // useCreateIndex: true, // this option doesn't work any more
+        // useFindandModify: false, // this option doesn't work any more
+        useUnifiedTopology: true, // this is not needed in this version of nodejs
+      },
+    );
     console.log("db connection success");
   } catch (err) {
     console.log(err);
