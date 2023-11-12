@@ -1,13 +1,18 @@
 const express = require("express");
+const mongoose = require("mongoose");
 const morgan = require("morgan"); // request logger middleware
 const bodyparser = require("body-parser"); // parsing requests
 const rateLimit = require("express-rate-limit"); //  protecting server from over loaded requests from the same IP, which is a form of attack
 const helmet = require("helmet"); // helps in setting up headers for responses
 const mongosanitize = require("express-mongo-sanitize"); // mongo queries attacks protection
-// const urlencoded = require("body-parser/lib/types/urlencoded"); // parsing requests
 const xss = require("xss"); // params malicious attacks
 const cors = require("cors"); // cross origin resource sharing / requests from different domains
 const PORT = 4000;
+const dotenv = require("dotenv");
+const DB_URI =
+  "mongodb+srv://samsMay:samever7@project6.z9nfdkn.mongodb.net/?retryWrites=true&w=majority";
+const DB_PSWD = "samever7";
+dotenv.config({ path: "./confing.env" });
 
 const app = express();
 app.use(
@@ -37,13 +42,24 @@ const limiter = rateLimit({
   message: "Too many requests on this IP, Please try again in an hour",
 });
 
+// const DB = DB_URI.replace("<PASSWORD>", DB_PSWD);
+
+const connectMongo = async () => {
+  try {
+    await mongoose.connect("mongodb+srv://samsMay:samever7@cluster0.zyihuu3.mongodb.net/?retryWrites=true&w=majority");
+    console.log("db connection success");
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 app.use("/tawk", limiter);
 
 app.use(express.urlencoded({ extended: true }));
+connectMongo();
 app.get("/", (req, res) => {
   res.send("Hello World!");
 });
 app.listen(PORT, () => {
   console.log(`server is live on ${PORT}`);
 });
-console.log("app is running");
