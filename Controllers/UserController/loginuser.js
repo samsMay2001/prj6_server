@@ -1,10 +1,11 @@
 const jwt = require("jsonwebtoken");
 const JWT_SECRET = "asdfj231@!??l9i093097ajkjcipaiue";
+const bcrypt = require("bcryptjs");
 const signToken = (userId) => {
   return jwt.sign({ userId }, JWT_SECRET);
 };
 
-exports.login = async (User, req, res) => {
+const login = async (User, req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -14,18 +15,21 @@ exports.login = async (User, req, res) => {
     });
   }
 
-  const userDoc = await User.findOne({ email: email }).select("+password");
-  if (!userDoc || (await User.correctPassword(password, userDoc.password))) {
-    res.status(400).json({
+  const userDoc = await User.findOne({ email: email }).select("password"); // tested
+  // return res.send(userDoc);
+  if (!userDoc || (await bcrypt.compare(userDoc.password, password))) {
+    return res.status(400).json({
       status: "error",
       message: "Email or password is incorrect",
     });
-  }
+  } // tested
 
-  const token = signToken(userDoc._id);
+  const token = signToken(userDoc._id); // tested
   res.status(200).json({
     status: "success",
     message: "Logged in successfuly",
     token,
   });
 };
+
+module.exports = login;
