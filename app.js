@@ -9,6 +9,7 @@ const xss = require("xss"); // params malicious attacks
 const cors = require("cors"); // cross origin resource sharing / requests from different domains
 const PORT = 4000;
 const dotenv = require("dotenv");
+const useRoute = require('./Routes/user')
 const DB_URI =
   "mongodb+srv://samsMay:samever7@project6.z9nfdkn.mongodb.net/?retryWrites=true&w=majority";
 const DB_PSWD = "samever7";
@@ -65,9 +66,7 @@ app.use("/tawk", limiter);
 
 app.use(express.urlencoded({ extended: true }));
 connectMongo();
-app.get("/", (req, res) => {
-  res.send("Hello World!");
-});
+app.use("/", useRoute);
 app.listen(PORT, () => {
   console.log(`server is live on ${PORT}`);
 });
