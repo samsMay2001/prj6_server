@@ -10,7 +10,7 @@ async function hashPassword(password) {
 }
 
 const create_func = async (User, req, res) => {
-  const { firstname, lastname, email, password } = req.body;
+  const { email } = req.body;
 
   const filteredBody = await filterObj(
     req.body,
