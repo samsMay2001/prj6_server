@@ -1,7 +1,10 @@
 const filterObj = require("../../utils/filterObj");
-
+const jwt = require("jsonwebtoken");
 const JWT_SECRET = "asdfj231@!??l9i093097ajkjcipaiue";
 const bcrypt = require("bcryptjs");
+const signToken = (userId) => {
+  return jwt.sign({ userId }, JWT_SECRET);
+};
 
 async function hashPassword(password) {
   const saltRounds = 10;
@@ -36,7 +39,18 @@ const create_func = async (User, req, res) => {
       filteredBody.password = hashed_pass;
       // create the user
       const new_user = await User.create(filteredBody);
-      return res.status(200).json(new_user);
+
+      // return a token and a token
+      const token = signToken(new_user._id); // tested
+
+      // console.log();
+      return res.status(200).json({
+        firstname: new_user.firstname, 
+        lastname: new_user.lastname, 
+        _id: new_user._id, 
+        token : token, 
+        email: new_user.email
+      });
     } catch (err) {
       console.log(err);
       res
