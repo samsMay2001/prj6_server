@@ -1,5 +1,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const http = require("http");
 const morgan = require("morgan"); // request logger middleware
 const bodyparser = require("body-parser"); // parsing requests
 const rateLimit = require("express-rate-limit"); //  protecting server from over loaded requests from the same IP, which is a form of attack
@@ -9,13 +10,37 @@ const xss = require("xss"); // params malicious attacks
 const cors = require("cors"); // cross origin resource sharing / requests from different domains
 const PORT = 4000;
 const dotenv = require("dotenv");
-const useRoute = require('./Routes/user')
+const useRoute = require("./Routes/user");
 const DB_URI =
   "mongodb+srv://samsMay:samever7@project6.z9nfdkn.mongodb.net/?retryWrites=true&w=majority";
 const DB_PSWD = "samever7";
 dotenv.config({ path: "./confing.env" });
-
 const app = express();
+const server = http.createServer(app);
+const { Server } = require("socket.io");
+const User = require("./models/user");
+const io = new Server(server, {
+  cors: {
+    origin: "https://j55mxk-3000.csb.app",
+    methods: ["GET", "POST"],
+  },
+});
+io.on("connection", async (socket) => {
+  const user_id = socket.handshake.query["user_id"];
+  const socket_id = socket.id;
+  console.log("user connected", socket_id);
+  if (user_id) {
+    await User.findByIdAndUpdate(user_id, { socket_id });
+  }
+  socket.on("friend_request", async (data) => {
+    console.log(data.to);
+    const to = await User.findById(data.to);
+    io.to(to.socket_id).emit("new_friend_request", {
+      // create friend requests.
+    });
+  });
+});
+
 app.use(
   cors({
     origin: "*",

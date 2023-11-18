@@ -45,6 +45,15 @@ const userSchema = new mongoose.Schema({
   updatedAt: {
     type: Date,
   },
+  socket_id : {
+    type: String
+  }, 
+  friends: [
+    {
+      type: mongoose.Schema.ObjectId, 
+      ref: "User"
+    }
+  ]
 });
 
 const User = new mongoose.model("User", userSchema);

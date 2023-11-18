@@ -11,5 +11,8 @@ router.post(
   //  user.protect, // not tested
   user.update,
 );
+router.post("/users", user.get); // tested
+router.post("/friends", user.getFriends); // tested
+router.post("/requests", user.getRequests); // tested
 
 module.exports = router;
