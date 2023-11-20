@@ -21,7 +21,7 @@ const { Server } = require("socket.io");
 const User = require("./models/user");
 const io = new Server(server, {
   cors: {
-    origin: "https://j55mxk-3000.csb.app",
+    origin: "https://lcmrhv-3000.csb.app",
     methods: ["GET", "POST"],
   },
 });

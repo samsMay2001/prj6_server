@@ -1,4 +1,5 @@
 const getRequests = async (req, res, User, FriendRequest) => {
+  return res.json(req.body);
   try {
     const requests = await FriendRequest.find({
       recipient: req.body._id,

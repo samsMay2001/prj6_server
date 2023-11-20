@@ -1,5 +1,4 @@
 const getFriends = async (req, res, User) => {
-  console.log(req.body);
   try {
     const current_user = await User.findById(req.body._id).populate(
       "friends",
