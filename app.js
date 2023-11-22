@@ -79,41 +79,40 @@ socketIO.on("connection", async (socket) => {
         sender: data.from,
         recipient: data.to,
       });
-
       socketIO.to(to_user.socket_id).emit("new_friend_request", {
         message: "New friend request recieved",
+      });
+      socketIO.to(from_user.socket_id).emit("request_sent", {
+        message: "Request sent successfully",
       });
     } catch (err) {
       console.log(err);
     }
   });
-  socket.on("accept_request", async (data)=> {
-    try{
+  socket.on("accept_request", async (data) => {
+    try {
+      const request_doc = await FriendRequest.findById(data.request_id);
+      const sender = await User.findById(request_doc.sender);
+      const receiver = await User.findById(request_doc.recipient);
 
-      const request_doc = await FriendRequest.findById(data.request_id); 
-      const sender = await User.findById(request_doc.sender); 
-      const receiver = await User.findById(request_doc.recipient); 
-  
-      sender.friends.push(request_doc.recipient); 
-      receiver.friends.push(request_doc.sender); 
-  
-      await receiver.save({new: true, validateModifiedOnly: true}); 
-      await sender.save({new: true, validateModifiedOnly: true}); 
+      sender.friends.push(request_doc.recipient);
+      receiver.friends.push(request_doc.sender);
+
+      await receiver.save({ new: true, validateModifiedOnly: true });
+      await sender.save({ new: true, validateModifiedOnly: true });
 
       // delete the friend request
-      await FriendRequest.findByAndDelete(data.request_id); 
+      await FriendRequest.findByAndDelete(data.request_id);
 
       io.to(sender.socket_id).emit("request_accepted", {
-        message: 'friend request accepted', 
-      })
-      
-    }catch (err){
-      console.log(err)
+        message: "friend request accepted",
+      });
+    } catch (err) {
+      console.log(err);
     }
-
-  })
-  socket.on("end", ()=> {
-    console.log('closing connection')
-    socket.disconnect(0); 
-  })
+  });
+  socket.on("end", () => {
+    console.log("closing connection");
+    socket.disconnect(0);
+  });
 });
