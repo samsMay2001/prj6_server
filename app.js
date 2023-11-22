@@ -16,6 +16,7 @@ const useRoute = require("./Routes/user");
 dotenv.config({ path: "./confing.env" });
 
 const User = require("./models/user");
+const FriendRequest = require("./models/friendRequests");
 
 app.use(
   cors({
@@ -58,8 +59,61 @@ connectMongo();
 app.use("/", useRoute);
 http.listen(PORT, () => {
   console.log(`server is live on ${PORT}`);
-  socketIO.on("connection", async (socket) => {
-    console.log("A user connected");
-    //
+});
+
+socketIO.on("connection", async (socket) => {
+  // console.log("A user connected");
+  const user_id = socket.handshake.query["user_id"];
+  const socket_id = socket.id;
+
+  if (user_id) {
+    // creates the socket property in the User schema for this particular user
+    await User.findByIdAndUpdate(user_id, { socket_id });
+  }
+  socket.on("friend_request", async (data) => {
+    try {
+      const to = await User.findById(data.to);
+      const to_user = await User.findById(data.to).select("socket_id");
+      const from_user = await User.findById(data.from).select("socket_id"); //currently, data.from is 0 abd findById only works with 24 character hex strings
+      await FriendRequest.create({
+        sender: data.from,
+        recipient: data.to,
+      });
+
+      socketIO.to(to_user.socket_id).emit("new_friend_request", {
+        message: "New friend request recieved",
+      });
+    } catch (err) {
+      console.log(err);
+    }
   });
+  socket.on("accept_request", async (data)=> {
+    try{
+
+      const request_doc = await FriendRequest.findById(data.request_id); 
+      const sender = await User.findById(request_doc.sender); 
+      const receiver = await User.findById(request_doc.recipient); 
+  
+      sender.friends.push(request_doc.recipient); 
+      receiver.friends.push(request_doc.sender); 
+  
+      await receiver.save({new: true, validateModifiedOnly: true}); 
+      await sender.save({new: true, validateModifiedOnly: true}); 
+
+      // delete the friend request
+      await FriendRequest.findByAndDelete(data.request_id); 
+
+      io.to(sender.socket_id).emit("request_accepted", {
+        message: 'friend request accepted', 
+      })
+      
+    }catch (err){
+      console.log(err)
+    }
+
+  })
+  socket.on("end", ()=> {
+    console.log('closing connection')
+    socket.disconnect(0); 
+  })
 });
