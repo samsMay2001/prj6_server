@@ -21,13 +21,13 @@ const update = async (User, req, res) => {
 
     res.status(200).json({
       status: "success",
-      data: updated_user,
+      data : updated_user,
       message: "Profile Updated successfuly",
     });
   } catch (err) {
     console.log(err);
     res.status(400).json({
-      message: "error on the server",
+      message: "error on the server", 
     });
   }
 };
