@@ -95,7 +95,7 @@ socketIO.on("connection", async (socket) => {
 
       const friendRequests = await FriendRequest.find();
       const to_user = await User.findById(data.to_id).select("socket_id");
-      const from_user = await User.findById(data.from_id).select("socket_id"); 
+      const from_user = await User.findById(data.from_id).select("socket_id");
       const requestId = friendRequests.findIndex(
         (item) =>
           item.sender.toString() === data.from_id &&
@@ -122,9 +122,9 @@ socketIO.on("connection", async (socket) => {
       await sender.save({ new: true, validateModifiedOnly: true });
 
       // delete the friend request
-      await FriendRequest.findByAndDelete(data.request_id);
+      await FriendRequest.findByIdAndDelete(data.request_id);
 
-      io.to(sender.socket_id).emit("request_accepted", {
+      socketIO.to(sender.socket_id).emit("request_accepted", {
         message: "friend request accepted",
       });
     } catch (err) {
