@@ -72,19 +72,21 @@ socketIO.on("connection", async (socket) => {
   }
   socket.on("friend_request", async (data) => {
     try {
-      const to = await User.findById(data.to);
-      const to_user = await User.findById(data.to).select("socket_id");
-      const from_user = await User.findById(data.from).select("socket_id"); //currently, data.from is 0 abd findById only works with 24 character hex strings
-      await FriendRequest.create({
-        sender: data.from,
-        recipient: data.to,
-      });
-      socketIO.to(to_user.socket_id).emit("new_friend_request", {
-        message: "New friend request recieved",
-      });
-      socketIO.to(from_user.socket_id).emit("request_sent", {
-        message: "Request sent successfully",
-      });
+      if (data.to_id && data.from_id){
+        const to = await User.findById(data.to);
+        const to_user = await User.findById(data.to).select("socket_id");
+        const from_user = await User.findById(data.from).select("socket_id"); //currently, data.from is 0 abd findById only works with 24 character hex strings
+        await FriendRequest.create({
+          sender: data.from,
+          recipient: data.to,
+        });
+        socketIO.to(to_user.socket_id).emit("new_friend_request", {
+          message: "New friend request recieved",
+        });
+        socketIO.to(from_user.socket_id).emit("request_sent", {
+          message: "Request sent successfully",
+        });
+      }
     } catch (err) {
       console.log(err);
     }
@@ -92,20 +94,18 @@ socketIO.on("connection", async (socket) => {
   socket.on("cancel_request", async (data) => {
     try {
       // find the request where the sender is data.from_id and receiver isdata.to_id
-      if (data.to_id && data.from_id){
-        const friendRequests = await FriendRequest.find();
-        const to_user = await User.findById(data.to_id).select("socket_id");
-        const from_user = await User.findById(data.from_id).select("socket_id");
-        const requestId = friendRequests.findIndex(
-          (item) =>
-            item.sender.toString() === data.from_id &&
-            item.recipient.toString() === data.to_id,
-        );
-        await FriendRequest.findByIdAndDelete(friendRequests[requestId]._id);
-        socketIO.to(from_user.socket_id).emit("request_cancelled", {
-          message: "friend request accepted",
-        });
-      }
+      const friendRequests = await FriendRequest.find();
+      const to_user = await User.findById(data.to_id).select("socket_id");
+      const from_user = await User.findById(data.from_id).select("socket_id");
+      const requestId = friendRequests.findIndex(
+        (item) =>
+          item.sender.toString() === data.from_id &&
+          item.recipient.toString() === data.to_id,
+      );
+      await FriendRequest.findByIdAndDelete(friendRequests[requestId]._id);
+      socketIO.to(from_user.socket_id).emit("request_cancelled", {
+        message: "friend request accepted",
+      });
     } catch (err) {
       console.log(err);
     }
