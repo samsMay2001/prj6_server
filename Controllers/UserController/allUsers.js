@@ -28,9 +28,11 @@ const allUsers = async (req, res, User) => {
     // this filters out the current user friends
     remaining_users.forEach((user) => {
       if (users[currentUserIndex].friends.length < 1) {
+        // a user with no friends
         const newUserObj = { ...user._doc, friend: false };
         remaining_users1.push(newUserObj);
       } else {
+        // a user with friends
         users[currentUserIndex].friends.forEach((friend) => {
           console.log(user);
           if (friend.toString() === user._id.toString()) {
@@ -40,10 +42,9 @@ const allUsers = async (req, res, User) => {
             const newUserObj = { ...user._doc, friend: false };
             remaining_users1.push(newUserObj);
           }
-      });
+        });
       }
     });
-    console.log(remaining_users1);
     // this adds the added property for users who have been sent friend request but haven't accepted yet
     const usersWithAddedFlag = remaining_users1.map((userObj) => {
       if (addedUsers.includes(userObj._id.toString())) {
