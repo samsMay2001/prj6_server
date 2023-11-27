@@ -72,7 +72,7 @@ socketIO.on("connection", async (socket) => {
   }
   socket.on("friend_request", async (data) => {
     try {
-      if (data.to_id && data.from_id){
+      if (data.to_id && data.from_id) {
         const to = await User.findById(data.to);
         const to_user = await User.findById(data.to).select("socket_id");
         const from_user = await User.findById(data.from).select("socket_id"); //currently, data.from is 0 abd findById only works with 24 character hex strings
@@ -116,17 +116,25 @@ socketIO.on("connection", async (socket) => {
       const sender = await User.findById(request_doc.sender);
       const receiver = await User.findById(request_doc.recipient);
 
-      console.log(request_doc)
+      // // add to the sender and reciever friends array
       // sender.friends.push(request_doc.recipient);
       // receiver.friends.push(request_doc.sender);
 
       // await receiver.save({ new: true, validateModifiedOnly: true });
       // await sender.save({ new: true, validateModifiedOnly: true });
 
-      // delete the friend request
-      // await FriendRequest.findByIdAndDelete(data.request_id);
+      // add that a property of accepted to equal to true
+      await FriendRequest.findByIdAndUpdate(
+        data.request_id,
+        { 
+           accepted: true 
+        }
+      );
 
       socketIO.to(sender.socket_id).emit("request_accepted", {
+        message: "friend request accepted",
+      });
+      socketIO.to(receiver.socket_id).emit("request_accepted", {
         message: "friend request accepted",
       });
     } catch (err) {

@@ -23,30 +23,30 @@ const allUsers = async (req, res, User) => {
     const remaining_users = users.filter(
       (user) => user._id.toString() !== this_user._id.toString(),
     );
-    const remaining_users1 = [];
+    // const remaining_users1 = [];
 
-    // this filters out the current user friends
-    remaining_users.forEach((user) => {
-      if (users[currentUserIndex].friends.length < 1) {
-        // a user with no friends
-        const newUserObj = { ...user._doc, friend: false };
-        remaining_users1.push(newUserObj);
-      } else {
-        // a user with friends
-        users[currentUserIndex].friends.forEach((friend) => {
-          console.log(user);
-          if (friend.toString() === user._id.toString()) {
-            const newUserObj = { ...user._doc, friend: true };
-            remaining_users1.push(newUserObj);
-          } else {
-            const newUserObj = { ...user._doc, friend: false };
-            remaining_users1.push(newUserObj);
-          }
-        });
+    // creates a new users with friends arrays containing strings to make it easier to iterate through
+    const remaining_users1 = remaining_users.map((user) => {
+      const newFriends = user.friends.map(objectId => objectId.toString());
+
+      return {
+        _id: user._id, 
+        friends : newFriends, 
+        firstname : user.firstname, 
+        lastname : user.lastname, 
       }
     });
-    // this adds the added property for users who have been sent friend request but haven't accepted yet
-    const usersWithAddedFlag = remaining_users1.map((userObj) => {
+    // adds friends tags to the users
+    const remaining_users3 = remaining_users1.map((user) => {
+      if (user.friends.includes(req.body._id)){
+        return {...user, friend: true}
+      }
+      else {
+        return {...user, friend: false}
+      }
+    })
+    // adds "added" tags to the users
+    const usersWithAddedFlag = remaining_users3.map((userObj) => {
       if (addedUsers.includes(userObj._id.toString())) {
         // Create a new object with the "added" property
         return { ...userObj, added: true };

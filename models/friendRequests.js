@@ -13,6 +13,9 @@ const requestSchema = new mongoose.Schema({
     type: Date,
     default: Date.now(),
   },
+  accepted: {
+    type: Boolean,
+  }
 });
 
 const FriendRequest = new mongoose.model("FriendRequest", requestSchema);
