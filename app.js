@@ -72,7 +72,7 @@ socketIO.on("connection", async (socket) => {
   }
   socket.on("friend_request", async (data) => {
     try {
-      if (data.to_id && data.from_id) {
+      if (data.to && data.from) {
         const to = await User.findById(data.to);
         const to_user = await User.findById(data.to).select("socket_id");
         const from_user = await User.findById(data.from).select("socket_id"); //currently, data.from is 0 abd findById only works with 24 character hex strings
@@ -106,6 +106,9 @@ socketIO.on("connection", async (socket) => {
       socketIO.to(from_user.socket_id).emit("request_cancelled", {
         message: "friend request accepted",
       });
+      socketIO.to(to_user.socket_id).emit("request_cancelled", {
+        message: "friend request cancelled"
+      }); 
     } catch (err) {
       console.log(err);
     }
