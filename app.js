@@ -17,6 +17,9 @@ dotenv.config({ path: "./confing.env" });
 
 const User = require("./models/user");
 const FriendRequest = require("./models/friendRequests");
+const onFriendRequest = require("./Controllers/SocketController/friendRequest");
+const onAcceptRequest = require("./Controllers/SocketController/acceptRequest");
+const onCancelRequest = require("./Controllers/SocketController/cancelRequest");
 
 app.use(
   cors({
@@ -68,81 +71,21 @@ socketIO.on("connection", async (socket) => {
 
   if (user_id) {
     // creates the socket property in the User schema for this particular user
-    await User.findByIdAndUpdate(user_id, { socket_id });
+    await User.findByIdAndUpdate(user_id, { socket_id, status: "Online" });
   }
   socket.on("friend_request", async (data) => {
-    try {
-      if (data.to && data.from) {
-        const to = await User.findById(data.to);
-        const to_user = await User.findById(data.to).select("socket_id");
-        const from_user = await User.findById(data.from).select("socket_id"); //currently, data.from is 0 abd findById only works with 24 character hex strings
-        await FriendRequest.create({
-          sender: data.from,
-          recipient: data.to,
-        });
-        socketIO.to(to_user.socket_id).emit("new_friend_request", {
-          message: "New friend request recieved",
-        });
-        socketIO.to(from_user.socket_id).emit("request_sent", {
-          message: "Request sent successfully",
-        });
-      }
-    } catch (err) {
-      console.log(err);
-    }
+    await onFriendRequest(socketIO, data, User, FriendRequest);
   });
   socket.on("cancel_request", async (data) => {
-    try {
-      // find the request where the sender is data.from_id and receiver isdata.to_id
-      const friendRequests = await FriendRequest.find();
-      const to_user = await User.findById(data.to_id).select("socket_id");
-      const from_user = await User.findById(data.from_id).select("socket_id");
-      const requestId = friendRequests.findIndex(
-        (item) =>
-          item.sender.toString() === data.from_id &&
-          item.recipient.toString() === data.to_id,
-      );
-      await FriendRequest.findByIdAndDelete(friendRequests[requestId]._id);
-      socketIO.to(from_user.socket_id).emit("request_cancelled", {
-        message: "friend request accepted",
-      });
-      socketIO.to(to_user.socket_id).emit("request_cancelled", {
-        message: "friend request cancelled",
-      });
-    } catch (err) {
-      console.log(err);
-    }
+    await onCancelRequest(socketIO, data, User, FriendRequest);
   });
   socket.on("accept_request", async (data) => {
-    try {
-      const request_doc = await FriendRequest.findById(data.request_id);
-      const sender = await User.findById(request_doc.sender);
-      const receiver = await User.findById(request_doc.recipient);
-
-      // // add to the sender and reciever friends array
-      sender.friends.push(request_doc.recipient);
-      receiver.friends.push(request_doc.sender);
-
-      await receiver.save({ new: true, validateModifiedOnly: true });
-      await sender.save({ new: true, validateModifiedOnly: true });
-
-      // add that a property of accepted to equal to true
-      await FriendRequest.findByIdAndUpdate(data.request_id, {
-        accepted: true,
-      });
-
-      socketIO.to(sender.socket_id).emit("request_accepted", {
-        message: "friend request accepted",
-      });
-      // the user may not have a socket id
-      socketIO.to(receiver.socket_id).emit("request_accepted", {
-        message: "friend request accepted",
-      });
-    } catch (err) {
-      console.log(err);
-    }
+    await onAcceptRequest(socketIO, data, User, FriendRequest);
   });
-  socket.on("end", () => {
+  socket.on("end", async (data) => {
+    if (data.user_id) {
+      await User.findByIdAndUpdate(data.user_id, { status: "offline" });
+    }
     console.log("closing connection");
     socket.disconnect(0);
   });
