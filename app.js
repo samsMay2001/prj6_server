@@ -20,6 +20,7 @@ const FriendRequest = require("./models/friendRequests");
 const onFriendRequest = require("./Controllers/SocketController/friendRequest");
 const onAcceptRequest = require("./Controllers/SocketController/acceptRequest");
 const onCancelRequest = require("./Controllers/SocketController/cancelRequest");
+const onTextMessage = require("./Controllers/SocketController/onTextMessage");
 
 app.use(
   cors({
@@ -81,6 +82,9 @@ socketIO.on("connection", async (socket) => {
   });
   socket.on("accept_request", async (data) => {
     await onAcceptRequest(socketIO, data, User, FriendRequest);
+  });
+  socket.on("text_message", async (data) => {
+    await onTextMessage(data);
   });
   socket.on("end", async (data) => {
     if (data.user_id) {
