@@ -20,7 +20,7 @@ const FriendRequest = require("./models/friendRequests");
 const onFriendRequest = require("./Controllers/SocketController/friendRequest");
 const onAcceptRequest = require("./Controllers/SocketController/acceptRequest");
 const onCancelRequest = require("./Controllers/SocketController/cancelRequest");
-const onTextMessage = require("./Controllers/SocketController/onTextMessage");
+const onTextMessage = require("./Controllers/SocketController/textMessage");
 
 app.use(
   cors({

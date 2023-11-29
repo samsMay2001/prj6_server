@@ -15,7 +15,7 @@ const login = async (User, req, res) => {
     });
   }
 
-  const userDoc = await User.findOne({ email: email }).select("password"); // tested
+  const userDoc = await User.findOne({ email: email }); // tested
   // return res.send(userDoc);
   if (!userDoc || (await bcrypt.compare(userDoc.password, password))) {
     return res.status(400).json({

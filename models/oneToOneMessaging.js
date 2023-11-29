@@ -1,12 +1,6 @@
 const mongoose = require("mongoose");
 
-const oneToOneMessageSchema = new mongoose.Schema({
-  participants: [
-    {
-      type: mongoose.Schema.ObjectId,
-      ref: "User",
-    },
-  ],
+const MessagesSchema = new mongoose.Schema({
   messages: [
     {
       to: {
@@ -35,5 +29,5 @@ const oneToOneMessageSchema = new mongoose.Schema({
   ],
 });
 
-const Message = new mongoose.model("Messages", oneToOneMessageSchema);
+const Message = new mongoose.model("Messages", MessagesSchema);
 module.exports = Message;
