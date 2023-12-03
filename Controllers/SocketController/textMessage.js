@@ -1,4 +1,2 @@
-const onTextMessage = async (data) => {
-
-};
-module.exports = onTextMessage; 
+const onTextMessage = async (data) => {};
+module.exports = onTextMessage;

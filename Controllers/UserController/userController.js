@@ -2,6 +2,7 @@ const JWT_SECRET = "asdfj231@!??l9i093097ajkjcipaiue";
 
 const User = require("../../models/user");
 const FriendRequest = require("../../models/friendRequests");
+const Message = require("../../models/oneToOneMessaging");
 const create_fc = require("./createuser");
 const login_fc = require("./loginuser");
 const protect_fc = require("./protect");
@@ -9,6 +10,7 @@ const update_fc = require("./updateuser");
 const allUsers_fc = require("./allUsers");
 const getFriends_fc = require("./getFriends");
 const getRequests_fc = require("./getRequests");
+const getMessages_fc = require("./getMessages");
 
 module.exports = {
   get: async (req, res) => {
@@ -31,5 +33,8 @@ module.exports = {
   },
   getRequests: async (req, res) => {
     getRequests_fc(req, res, User, FriendRequest);
+  },
+  getMessages: async (req, res) => {
+    getMessages_fc(req, res, Message);
   },
 };

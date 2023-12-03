@@ -27,24 +27,23 @@ const allUsers = async (req, res, User) => {
 
     // creates a new users with friends arrays containing strings to make it easier to iterate through
     const remaining_users1 = remaining_users.map((user) => {
-      const newFriends = user.friends.map(objectId => objectId.toString());
+      const newFriends = user.friends.map((objectId) => objectId.toString());
 
       return {
-        _id: user._id, 
-        friends : newFriends, 
-        firstname : user.firstname, 
-        lastname : user.lastname, 
-      }
+        _id: user._id,
+        friends: newFriends,
+        firstname: user.firstname,
+        lastname: user.lastname,
+      };
     });
     // adds friends tags to the users
     const remaining_users3 = remaining_users1.map((user) => {
-      if (user.friends.includes(req.body._id)){
-        return {...user, friend: true}
+      if (user.friends.includes(req.body._id)) {
+        return { ...user, friend: true };
+      } else {
+        return { ...user, friend: false };
       }
-      else {
-        return {...user, friend: false}
-      }
-    })
+    });
     // adds "added" tags to the users
     const usersWithAddedFlag = remaining_users3.map((userObj) => {
       if (addedUsers.includes(userObj._id.toString())) {
