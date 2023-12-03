@@ -14,6 +14,7 @@ router.post(
 router.post("/users", user.get); // tested
 router.post("/friends", user.getFriends); // tested
 router.post("/requests", user.getRequests); // tested
-router.post("/messages", user.getMessages); //
+router.post("/messages", user.getMessages); // tested
+router.post("/chatlist", user.getChatList);
 
 module.exports = router;

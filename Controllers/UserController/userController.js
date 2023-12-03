@@ -3,6 +3,7 @@ const JWT_SECRET = "asdfj231@!??l9i093097ajkjcipaiue";
 const User = require("../../models/user");
 const FriendRequest = require("../../models/friendRequests");
 const Message = require("../../models/oneToOneMessaging");
+const ChatRoom = require("../../models/chatRooms");
 const create_fc = require("./createuser");
 const login_fc = require("./loginuser");
 const protect_fc = require("./protect");
@@ -11,6 +12,7 @@ const allUsers_fc = require("./allUsers");
 const getFriends_fc = require("./getFriends");
 const getRequests_fc = require("./getRequests");
 const getMessages_fc = require("./getMessages");
+const getChatList_fc = require("./getChatList");
 
 module.exports = {
   get: async (req, res) => {
@@ -36,5 +38,8 @@ module.exports = {
   },
   getMessages: async (req, res) => {
     getMessages_fc(req, res, Message);
+  },
+  getChatList: async (req, res) => {
+    getChatList_fc(req, res, ChatRoom);
   },
 };
