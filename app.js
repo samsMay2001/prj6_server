@@ -21,6 +21,8 @@ const onFriendRequest = require("./Controllers/SocketController/friendRequest");
 const onAcceptRequest = require("./Controllers/SocketController/acceptRequest");
 const onCancelRequest = require("./Controllers/SocketController/cancelRequest");
 const onTextMessage = require("./Controllers/SocketController/textMessage");
+const Message = require("./models/oneToOneMessaging");
+const ChatRoom = require("./models/chatRooms");
 
 app.use(
   cors({
@@ -84,7 +86,48 @@ socketIO.on("connection", async (socket) => {
     await onAcceptRequest(socketIO, data, User, FriendRequest);
   });
   socket.on("text_message", async (data) => {
-    await onTextMessage(data);
+    // data : {from, to, message, type, conversation_id}
+    const {from, to, message, type, created_at, file} = data
+
+    const new_message = {from, to, message, type, created_at, file}
+    try{
+      
+      // check if the message already exists
+      const messages = await Message.find({
+        $or: [
+          {
+            from: new mongoose.Types.ObjectId(from),
+            to: new mongoose.Types.ObjectId(to[0]),
+          },
+          {
+            from: new mongoose.Types.ObjectId(to[0]),
+            to: new mongoose.Types.ObjectId(from),
+          },
+        ],
+      });
+      const sender = await User.findById(from)
+      const receiver = await User.findById(to[0])
+      if (messages === null){
+        // create a new chat
+        const new_chat = {
+          participants : [from, to[0]]
+        }
+        await ChatRoom.create(new_chat)
+        ChatRoom.save()
+      }
+      // add to the messages array
+      await Message.create(new_message)
+      // await onTextMessage(data);
+      socketIO.to(sender.socket_id).emit("message_sent", {
+        message: "message sent successfully"
+      })
+      socketIO.to(receiver.socket_id).emit("new_message", {
+        message: 'new_message'
+      })
+    }catch(err){
+      console.log(err)
+    }
+    
   });
   socket.on("end", async (data) => {
     if (data.user_id) {
