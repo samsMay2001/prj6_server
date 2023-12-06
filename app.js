@@ -89,7 +89,10 @@ socketIO.on("connection", async (socket) => {
     // data : {from, to, message, type, conversation_id}
     const {from, to, message, type, created_at, file} = data
 
+    // console.log(to)
+
     const new_message = {from, to, message, type, created_at, file}
+
     try{
       
       // check if the message already exists
@@ -97,23 +100,22 @@ socketIO.on("connection", async (socket) => {
         $or: [
           {
             from: new mongoose.Types.ObjectId(from),
-            to: new mongoose.Types.ObjectId(to[0]),
+            to: new mongoose.Types.ObjectId(to),
           },
           {
-            from: new mongoose.Types.ObjectId(to[0]),
+            from: new mongoose.Types.ObjectId(to),
             to: new mongoose.Types.ObjectId(from),
           },
         ],
       });
       const sender = await User.findById(from)
-      const receiver = await User.findById(to[0])
-      if (messages === null){
+      const receiver = await User.findById(to)
+      if (messages.length === 0){
         // create a new chat
         const new_chat = {
-          participants : [from, to[0]]
+          participants : [from, to]
         }
         await ChatRoom.create(new_chat)
-        ChatRoom.save()
       }
       // add to the messages array
       await Message.create(new_message)
