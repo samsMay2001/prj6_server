@@ -40,6 +40,6 @@ module.exports = {
     getMessages_fc(req, res, Message);
   },
   getChatList: async (req, res) => {
-    getChatList_fc(req, res, ChatRoom);
+    getChatList_fc(req, res, ChatRoom, User);
   },
 };
