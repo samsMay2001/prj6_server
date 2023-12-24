@@ -58,6 +58,9 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum: ["online", "offline"],
   },
+  currentChat: {
+    type: Number,
+  }
   // status: {
   //   type: String,
   //   enum: ["online", "offline"],
