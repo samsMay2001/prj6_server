@@ -32,6 +32,7 @@ const login = async (User, req, res) => {
     _id: userDoc._id,
     firstname: userDoc.firstname,
     lastname: userDoc.lastname,
+    currentChat: userDoc.currentChat ? userDoc.currentChat : undefined
   });
 };
 

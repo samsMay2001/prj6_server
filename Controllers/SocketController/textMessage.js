@@ -47,14 +47,14 @@ const onTextMessage = async (data, Message, User, ChatRoom, socketIO) => {
       // update the sender's current chat
       const updatedSender = await User.findOneAndUpdate(
         { _id: sender._id }, // Assuming sender has an _id field
-        { $set: { currentChat: currentChat } },
+        { $set: { currentChat: to } },
         { new: true, useFindAndModify: false }
       );
 
       // update the receiver's current chat
       const updatedReceiver = await User.findOneAndUpdate(
         { _id: receiver._id }, // Assuming receiver has an _id field
-        { $set: { currentChat: toIndex } },
+        { $set: { currentChat: from } },
         { new: true, useFindAndModify: false }
       );
 

@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const getChatList = async (req, res, ChatRoom, User) => {
   try {
-    const { user_id } = req.body; // Assuming the user ID is in req.body.userId
+    const { user_id, currentChat } = req.body; // Assuming the user ID is in req.body.userId
 
     const chatList = await ChatRoom.find({
       participants: { $in: [new mongoose.Types.ObjectId(user_id)] },
@@ -20,7 +20,15 @@ const getChatList = async (req, res, ChatRoom, User) => {
         return { ...chat._doc, names: names, msg: "", time: "9:00 am" };
       }),
     );
-    res.status(200).json(newChatList);
+    if (currentChat !== undefined){
+      const chatListCopy = JSON.parse(JSON.stringify(newChatList))
+      const indexOfVal =  chatListCopy.findIndex(chat => chat.participants.includes(currentChat.toString()))
+      const valueToMove = chatListCopy.splice(indexOfVal, 1)[0]; 
+      chatListCopy.unshift(valueToMove)
+      res.status(200).json(chatListCopy);
+    }else {
+      throw new Error("current is undefined")
+    }
   } catch (error) {
     console.error(error);
     res.status(500).send("Internal Server Error");
