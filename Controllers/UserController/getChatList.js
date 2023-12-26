@@ -25,6 +25,7 @@ const getChatList = async (req, res, ChatRoom, User) => {
       const indexOfVal =  chatListCopy.findIndex(chat => chat.participants.includes(currentChat.toString()))
       const valueToMove = chatListCopy.splice(indexOfVal, 1)[0]; 
       chatListCopy.unshift(valueToMove)
+      console.log(valueToMove)
       res.status(200).json(chatListCopy);
     }else {
       throw new Error("current is undefined")
