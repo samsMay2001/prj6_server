@@ -28,7 +28,7 @@ const getChatList = async (req, res, ChatRoom, User) => {
       console.log(valueToMove)
       res.status(200).json(chatListCopy);
     }else {
-      throw new Error("current is undefined")
+      throw new Error("currentChat is undefined")
     }
   } catch (error) {
     console.error(error);

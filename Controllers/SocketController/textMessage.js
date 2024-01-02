@@ -59,10 +59,10 @@ const onTextMessage = async (data, Message, User, ChatRoom, socketIO) => {
       );
 
       socketIO.to(sender.socket_id).emit("message_sent", {
-        message: "message sent successfully"
+        currentChat: to
       })
       socketIO.to(receiver.socket_id).emit("new_message", {
-        message: 'new_message'
+        currentChat: from
       })
     }catch(err){
       console.log(err)
