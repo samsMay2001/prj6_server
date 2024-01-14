@@ -13,6 +13,7 @@ const getFriends_fc = require("./getFriends");
 const getRequests_fc = require("./getRequests");
 const getMessages_fc = require("./getMessages");
 const getChatList_fc = require("./getChatList");
+const startVoiceCall_fc = require("./startVoiceCall"); 
 
 module.exports = {
   get: async (req, res) => {
@@ -42,4 +43,7 @@ module.exports = {
   getChatList: async (req, res) => {
     getChatList_fc(req, res, ChatRoom, User);
   },
+  startVoiceCall: async (req, res) => {
+    startVoiceCall_fc(req, res, AudioCall, User); 
+  }
 };
