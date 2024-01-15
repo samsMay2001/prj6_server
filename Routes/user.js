@@ -16,6 +16,6 @@ router.post("/friends", user.getFriends); // tested
 router.post("/requests", user.getRequests); // tested
 router.post("/messages", user.getMessages); // tested
 router.post("/chatlist", user.getChatList);
-router.post('/start-voice-call', user.startVoiceCall); 
+router.post('/start-audio-call', user.startVoiceCall); 
 
 module.exports = router;
